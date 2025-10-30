@@ -125,9 +125,11 @@ Upload the firmware from `ArduinoControl/` to your Teensy 4.1 using the Arduino 
 
 ## 🚀 Usage  
 
-### 1️⃣ Start the ROS 2 Node  
+### 1️⃣ Start the ROS 2 Nodes 
+- "CONTROLS" Starts the ROS 2 node for communication with microcontroller
+- "JOY_TO_CMD" Remaps jjoy sensor msgs to geometry msgs for topic cmd_vel
 ```bash
-ros2 run robot_control robot_control_node --ros-args   -p serial_port:=/dev/ttyACM0   -p baud_rate:=115200
+ros2 launch robot_control r_control.launch.py
 ```
 
 ### 2️⃣ Send Velocity Commands  
@@ -139,30 +141,14 @@ ros2 topic pub /cmd_vel geometry_msgs/msg/Twist   "{ linear: { x: 0.5, y: 0.0, z
 ```bash
 ros2 service call /relay_control robot_control/srv/RelayCmd   "{ relay_id: 1, state: true }"
 ```
+### Use remote controler
+- Make sure that remote is connected to a computer in the same ROS2 network
+- Start the Joy Node 
+```bash
+ros2 run joy joy_node
+``` 
 
 *(Relay IDs and topic names may vary based on your configuration.)*
-
----
-
-## 🧰 Configuration  
-
-You can define parameters in a YAML file for convenience:
-
-```yaml
-robot_control_node:
-  ros__parameters:
-    serial_port: "/dev/ttyUSB0"
-    baud_rate: 115200
-    left_motor_id: 1
-    right_motor_id: 2
-    relay_pins: [5, 6]
-```
-
-Launch with parameters:
-
-```bash
-ros2 run robot_control robot_control_node --ros-args   --params-file config.yaml
-```
 
 ---
 
@@ -173,14 +159,6 @@ ros2 run robot_control robot_control_node --ros-args   --params-file config.yaml
 - Offers robust read/write, configurable baud rate, and packet framing.  
 - Abstracts OS-specific serial APIs for Linux and Windows.  
 
-**Example API**
-```cpp
-Serial serial("/dev/ttyUSB0", 115200);
-serial.write("MOVE 0.5 0.2\n");
-std::string response = serial.readLine();
-```
-
----
 
 ### Relay Server  
 - Exposed as a ROS 2 service or TCP endpoint.  
@@ -189,35 +167,6 @@ std::string response = serial.readLine();
 
 ---
 
-## 🧯 Troubleshooting & Tips  
-
-| Problem | Possible Fix |
-|----------|---------------|
-| **`Permission denied` on serial port** | Add user to `dialout` group or run with `sudo`. |
-| **No motor movement** | Check Teensy firmware baud rate, wiring, and port. |
-| **Node crashes on startup** | Ensure ROS 2 version compatibility and all dependencies exist. |
-| **Relays not toggling** | Verify pin assignments and hardware wiring on Teensy. |
-| **No serial response** | Confirm `SerialCom` baud rate matches Teensy configuration. |
-
----
-
-## 🤝 Contributing  
-
-We welcome contributions!  
-
-1. Fork the repo and create a new branch.  
-2. Follow Google’s **C++ Style Guide** and **ROS 2 best practices**.  
-3. Write clear commit messages.  
-4. Open a Pull Request explaining your changes.
-
----
-
-## 📜 License  
-
-This project is licensed under the **MIT License**.  
-See the [LICENSE](LICENSE) file for details.
-
----
 
 ### ✨ Author  
 **Santiago Cuartas Palacio**  
